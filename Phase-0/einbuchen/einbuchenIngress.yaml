@@ -1,0 +1,16 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: einbuchen-ingress
+spec:
+  rules:
+  - host: 1.g.ch.innoq.io
+    http:
+      paths:
+      - path: /einbuchen
+        backend:
+          serviceName: einbuchen-crest-depl
+          servicePort: 8090

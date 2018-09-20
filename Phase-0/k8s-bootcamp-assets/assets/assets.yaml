@@ -19,4 +19,4 @@ spec:
       - name: asset-lars
         image: lars0395/assets
         ports:
-        - containerPort: 8080
+        - containerPort: 80
