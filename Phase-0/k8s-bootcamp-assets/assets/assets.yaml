@@ -1,0 +1,22 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: asset-lars
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: asset-lars
+  template:
+    metadata:
+      labels:
+        app: asset-lars
+        role: backend
+    spec:
+      containers:
+      - name: asset-lars
+        image: lars0395/assets
+        ports:
+        - containerPort: 8080

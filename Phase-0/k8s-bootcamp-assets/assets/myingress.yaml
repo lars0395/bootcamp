@@ -1,0 +1,16 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    assets.ingress.kubernetes.io/rewrite-target: /
+  name: myingress
+spec:
+  rules:
+  - host: 1.g.ch.innoq.io
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: asset-service
+          servicePort: 8080
