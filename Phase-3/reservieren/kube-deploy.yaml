@@ -134,7 +134,7 @@ metadata:
   name: reservieren
 spec:
   rules:
-  - host: 1.g.ch.innoq.io
+  - host: trainer.ch.innoq.io
     http:
       paths:
       - path: /reservieren

@@ -67,7 +67,7 @@ spec:
         - name: varnish-config-volume
           mountPath: /etc/varnish/
       - name: nginx
-        image: lars0395/assets:v2
+        image: lars0395/assets:v3
         ports:
         - containerPort: 80
           name: web
