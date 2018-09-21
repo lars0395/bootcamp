@@ -77,7 +77,8 @@ spec:
         - name: varnish-config-volume
           mountPath: /etc/varnish/
       - name: crest-depl
-        image: lars0395/einbuchen
+#        image: lars0395/einbuchen
+        image: containerbootcamp/einbuchen
         args:
         - -conf 
         - /etc/config/config.json
