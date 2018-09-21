@@ -1,0 +1,21 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: msg-handler-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: msg-handler-deployment
+      role: backend
+  template:
+    metadata:
+      labels:
+        app: msg-handler-deployment
+        role: backend
+    spec:
+      containers:
+      - name: msg-handler
+        image: lars0395/msg-handler

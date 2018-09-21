@@ -8,6 +8,7 @@ data:
   PORT: "8090"
 
 ---
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -33,6 +34,7 @@ data:
             set req.backend_hint = default;
         }
     }
+
 ---
 
 apiVersion: apps/v1
@@ -88,7 +90,7 @@ spec:
       volumes:
       - name: varnish-config-volume
         configMap:
-          name: varnish-for-assets
+          name: varnish-for-einbuchen
       - name: config-volume-depl
         emptyDir: {}
 
@@ -100,7 +102,23 @@ metadata:
   name: einbuchen-crest-depl
 spec:
   ports:
-  - port: 8090
+  - port: 8080
+    name: web
+  selector:
+    app: einbuchen-crest-depl
+    role: backend
+    scs: einbuchen
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: einbuchen-intern
+spec:
+  ports:
+  - port: 80
+    targetPort: 8090
     name: web
   selector:
     app: einbuchen-crest-depl
