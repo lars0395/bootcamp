@@ -1,0 +1,4 @@
+apiVersion: v1
+description: INNOQ fluentd
+version: 0.1
+name: fluentd

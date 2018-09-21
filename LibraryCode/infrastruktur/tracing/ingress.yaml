@@ -1,0 +1,13 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: jaeger
+spec:
+  rules:
+  - host: trainer.ch.innoq.io
+    http:
+      paths:
+      - path: /jaeger
+        backend:
+          serviceName: jaeger-query
+          servicePort: 80

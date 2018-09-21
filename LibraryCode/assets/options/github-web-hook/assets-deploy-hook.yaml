@@ -1,0 +1,146 @@
+---
+
+############################################
+# this one is created from default.conf by
+# $ kubectl create secret generic assets-nginx-conf --from-file=./default.conf
+############################################
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: assets-nginx-conf
+  namespace: bibliothek
+type: Opaque
+data:
+  default.conf: c2VydmVyIHsKICAgIGxpc3RlbiAgICAgICA4MDsKICAgIHNlcnZlcl9uYW1lICBsb2NhbGhvc3Q7CgogICAgI2NoYXJzZXQga29pOC1yOwogICAgI2FjY2Vzc19sb2cgIC92YXIvbG9nL25naW54L2xvZy9ob3N0LmFjY2Vzcy5sb2cgIG1haW47CgogICAgbG9jYXRpb24gLyB7CiAgICAgICAgIHJvb3QgICAvdXNyL3NoYXJlL25naW54L2h0bWw7CiAgICAgICAgIGluZGV4ICBpbmRleC5odG1sIGluZGV4Lmh0bTsKICAgICAgICAgICAgICAgIAogICAgICAgICBpZiAoJHJlcXVlc3RfbWV0aG9kID0gJ09QVElPTlMnKSB7CiAgICAgICAgICAgIGFkZF9oZWFkZXIgJ0FjY2Vzcy1Db250cm9sLUFsbG93LU9yaWdpbicgJyonOwogICAgICAgICAgICBhZGRfaGVhZGVyICdBY2Nlc3MtQ29udHJvbC1BbGxvdy1NZXRob2RzJyAnR0VULCBQT1NULCBPUFRJT05TJzsKICAgICAgICAgICAgIwogICAgICAgICAgICAjIEN1c3RvbSBoZWFkZXJzIGFuZCBoZWFkZXJzIHZhcmlvdXMgYnJvd3NlcnMgKnNob3VsZCogYmUgT0sgd2l0aCBidXQgYXJlbid0CiAgICAgICAgICAgICMKICAgICAgICAgICAgYWRkX2hlYWRlciAnQWNjZXNzLUNvbnRyb2wtQWxsb3ctSGVhZGVycycgJ0ROVCxYLUN1c3RvbUhlYWRlcixLZWVwLUFsaXZlLFVzZXItQWdlbnQsWC1SZXF1ZXN0ZWQtV2l0aCxJZi1Nb2RpZmllZC1TaW5jZSxDYWNoZS1Db250cm9sLENvbnRlbnQtVHlwZSc7CiAgICAgICAgICAgICMKICAgICAgICAgICAgIyBUZWxsIGNsaWVudCB0aGF0IHRoaXMgcHJlLWZsaWdodCBpbmZvIGlzIHZhbGlkIGZvciAyMCBkYXlzCiAgICAgICAgICAgICMKICAgICAgICAgICAgYWRkX2hlYWRlciAnQWNjZXNzLUNvbnRyb2wtTWF4LUFnZScgMTcyODAwMDsKICAgICAgICAgICAgYWRkX2hlYWRlciAnQ29udGVudC1UeXBlJyAndGV4dC9wbGFpbiBjaGFyc2V0PVVURi04JzsKICAgICAgICAgICAgYWRkX2hlYWRlciAnQ29udGVudC1MZW5ndGgnIDA7CiAgICAgICAgICAgIHJldHVybiAyMDQ7CiAgICAgICAgIH0KICAgICAgICAgaWYgKCRyZXF1ZXN0X21ldGhvZCA9ICdQT1NUJykgewogICAgICAgICAgICBhZGRfaGVhZGVyICdBY2Nlc3MtQ29udHJvbC1BbGxvdy1PcmlnaW4nICcqJzsKICAgICAgICAgICAgYWRkX2hlYWRlciAnQWNjZXNzLUNvbnRyb2wtQWxsb3ctTWV0aG9kcycgJ0dFVCwgUE9TVCwgT1BUSU9OUyc7CiAgICAgICAgICAgIGFkZF9oZWFkZXIgJ0FjY2Vzcy1Db250cm9sLUFsbG93LUhlYWRlcnMnICdETlQsWC1DdXN0b21IZWFkZXIsS2VlcC1BbGl2ZSxVc2VyLUFnZW50LFgtUmVxdWVzdGVkLVdpdGgsSWYtTW9kaWZpZWQtU2luY2UsQ2FjaGUtQ29udHJvbCxDb250ZW50LVR5cGUnOwogICAgICAgICB9CiAgICAgICAgIGlmICgkcmVxdWVzdF9tZXRob2QgPSAnR0VUJykgewogICAgICAgICAgICBhZGRfaGVhZGVyICdBY2Nlc3MtQ29udHJvbC1BbGxvdy1PcmlnaW4nICcqJzsKICAgICAgICAgICAgYWRkX2hlYWRlciAnQWNjZXNzLUNvbnRyb2wtQWxsb3ctTWV0aG9kcycgJ0dFVCwgUE9TVCwgT1BUSU9OUyc7CiAgICAgICAgICAgIGFkZF9oZWFkZXIgJ0FjY2Vzcy1Db250cm9sLUFsbG93LUhlYWRlcnMnICdETlQsWC1DdXN0b21IZWFkZXIsS2VlcC1BbGl2ZSxVc2VyLUFnZW50LFgtUmVxdWVzdGVkLVdpdGgsSWYtTW9kaWZpZWQtU2luY2UsQ2FjaGUtQ29udHJvbCxDb250ZW50LVR5cGUnOwogICAgICAgICB9CiAgICB9CiAgICAjZXJyb3JfcGFnZSAgNDA0ICAgICAgICAgICAgICAvNDA0Lmh0bWw7CgogICAgIyByZWRpcmVjdCBzZXJ2ZXIgZXJyb3IgcGFnZXMgdG8gdGhlIHN0YXRpYyBwYWdlIC81MHguaHRtbAogICAgIwogICAgZXJyb3JfcGFnZSAgIDUwMCA1MDIgNTAzIDUwNCAgLzUweC5odG1sOwogICAgbG9jYXRpb24gPSAvNTB4Lmh0bWwgewogICAgICAgIHJvb3QgICAvdXNyL3NoYXJlL25naW54L2h0bWw7CiAgICB9CgogICAgIyBwcm94eSB0aGUgUEhQIHNjcmlwdHMgdG8gQXBhY2hlIGxpc3RlbmluZyBvbiAxMjcuMC4wLjE6ODAKICAgICMKICAgICNsb2NhdGlvbiB+IFwucGhwJCB7CiAgICAjICAgIHByb3h5X3Bhc3MgICBodHRwOi8vMTI3LjAuMC4xOwogICAgI30KCiAgICAjIHBhc3MgdGhlIFBIUCBzY3JpcHRzIHRvIEZhc3RDR0kgc2VydmVyIGxpc3RlbmluZyBvbiAxMjcuMC4wLjE6OTAwMAogICAgIwogICAgI2xvY2F0aW9uIH4gXC5waHAkIHsKICAgICMgICAgcm9vdCAgICAgICAgICAgaHRtbDsKICAgICMgICAgZmFzdGNnaV9wYXNzICAgMTI3LjAuMC4xOjkwMDA7CiAgICAjICAgIGZhc3RjZ2lfaW5kZXggIGluZGV4LnBocDsKICAgICMgICAgZmFzdGNnaV9wYXJhbSAgU0NSSVBUX0ZJTEVOQU1FICAvc2NyaXB0cyRmYXN0Y2dpX3NjcmlwdF9uYW1lOwogICAgIyAgICBpbmNsdWRlICAgICAgICBmYXN0Y2dpX3BhcmFtczsKICAgICN9CgogICAgIyBkZW55IGFjY2VzcyB0byAuaHRhY2Nlc3MgZmlsZXMsIGlmIEFwYWNoZSdzIGRvY3VtZW50IHJvb3QKICAgICMgY29uY3VycyB3aXRoIG5naW54J3Mgb25lCiAgICAjCiAgICAjbG9jYXRpb24gfiAvXC5odCB7CiAgICAjICAgIGRlbnkgIGFsbDsKICAgICN9Cn0KCg==
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: varnish-for-assets
+  namespace: bibliothek
+data:
+  default.vcl: |-
+    vcl 4.0;
+    backend default {
+        .host = "localhost";
+        .port = "80";
+    }
+    sub vcl_backend_response {
+        set beresp.do_esi = true; // Do ESI processing
+    }
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ name: assets
+ namespace: bibliothek
+spec:
+ accessModes:
+  - ReadWriteOnce
+ resources:
+   requests:
+     storage: 1Gi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: assets
+  namespace: bibliothek
+  labels:
+    app: assets
+    role: frontend
+    scs: assets
+spec:
+  ports:
+  - port: 8080
+    name: web
+  selector:
+    app: assets
+
+---
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: assets
+  namespace: bibliothek
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: assets
+        role: frontend
+        scs: assets
+    spec:
+      containers:
+      - name: varnish-ssi
+        image: quay.io/containerbootcamp/alpine-varnish
+        volumeMounts:
+        - name: varnish-config-volume
+          mountPath: /etc/varnish/
+      - name: nginx
+        image: nginx:alpine
+        livenessProbe:
+          exec:
+            command: [ "kill", "-HUP", "1"]
+          initialDelaySeconds: 60
+          periodSeconds: 60
+        ports:
+        - containerPort: 80
+          name: web
+        volumeMounts:
+        - name: conf
+          mountPath: /etc/nginx/conf.d
+        - name: html
+          mountPath: /usr/share/nginx/html
+          subPath: git/k8s-bootcamp-assets
+      volumes:
+      - name: varnish-config-volume
+        configMap:
+          name: varnish-for-assets
+      - name: conf
+        secret:
+          secretName: assets-nginx-conf
+      - name: html
+        flexVolume:
+          driver: rook.io/rook
+          fsType: ceph
+          options:
+            fsName: myfs
+            clusterName: rook
+
+---
+
+#####
+# ingress to assets, test f.e. with
+# curl http://bootcamp.ch.innoq.io/assets/
+#####
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: basic-auth
+    nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+  name: assets
+  namespace: bibliothek
+spec:
+  rules:
+  - host: bootcamp.ch.innoq.io
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: assets
+          servicePort: 8080

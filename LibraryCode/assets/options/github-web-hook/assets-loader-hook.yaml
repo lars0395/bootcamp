@@ -1,0 +1,79 @@
+---
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: assets-loader-hook
+  namespace: bibliothek
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: assets-loader-hook
+        role: frontend
+        scs: assets
+    spec:
+      containers:
+      - name: handler
+        image: quay.io/containerbootcamp/github-webhook-handler
+        env:
+        - name: BRANCH
+          value: "master"
+        - name: REPO
+          value: "https://github.com/container-bootcamp/k8s-bootcamp-assets.git"
+        - name: LOCATION
+          value: "/assets/k8s-bootcamp-assets"
+        - name: AUTOPULL
+          value: "1"
+        - name: SECRET
+          value: "BoOtCaMp"
+        volumeMounts:
+        - name: html
+          mountPath: /assets
+          subPath: git
+      volumes:
+        - name: html
+          flexVolume:
+            driver: rook.io/rook
+            fsType: ceph
+            options:
+              fsName: myfs
+              clusterName: rook
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: assets-loader-hook
+  namespace: bibliothek
+  labels:
+    app: assets-loader-hook
+    role: frontend
+    scs: assets
+spec:
+  ports:
+  - port: 7777
+    name: web
+  selector:
+    app: assets-loader-hook
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+  name: assets-hook
+  namespace: bibliothek
+spec:
+  rules:
+  - host: bootcamp.ch.innoq.io
+    http:
+      paths:
+      - path: /assets-loader-hook
+        backend:
+          serviceName: assets-loader-hook
+          servicePort: 7777

@@ -1,0 +1,23 @@
+{{- if .Values.rbac.create -}}
+{{- if .Values.psp.create -}}
+kind: ClusterRole
+{{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1beta1" }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- else if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1alpha1" }}
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+{{- end }}
+metadata:
+  labels:
+    app: {{ template "kubernetes-fluentd.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: psp-{{ template "kubernetes-fluentd.fullname" . }}
+rules:
+- apiGroups: ['extensions']
+  resources: ['podsecuritypolicies']
+  verbs:     ['use']
+  resourceNames:
+  - {{ template "kubernetes-fluentd.fullname" . }}
+{{- end }}
+{{- end }}

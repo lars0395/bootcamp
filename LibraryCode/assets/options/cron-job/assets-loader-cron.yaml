@@ -1,0 +1,37 @@
+---
+
+apiVersion: batch/v2alpha1
+kind: CronJob
+metadata:
+  name: assets-loader-cron
+  namespace: bibliothek
+spec:
+  schedule: "*/1 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: assets-loader
+            image: busybox
+            env:
+            - name: VERSION
+              value: "0.4"
+            command:
+            - /bin/sh
+            - -c
+            - wget https://github.com/FaKod/k8s-bootcamp-assets/archive/$VERSION.tar.gz -O - | tar -xz --strip 1 -C /assets
+            volumeMounts:
+            - name: html
+              mountPath: /assets
+          volumes:
+          - name: html
+            flexVolume:
+              driver: rook.io/rook
+              fsType: ceph
+              options:
+                fsName: myfs
+                clusterName: rook

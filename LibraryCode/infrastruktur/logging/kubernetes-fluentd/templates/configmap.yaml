@@ -1,0 +1,360 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: {{ template "kubernetes-fluentd.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: {{ template "kubernetes-fluentd.fullname" . }}
+data:
+  kubernetes.conf: |
+    <match fluent.**>
+      @type null
+    </match>
+
+    <source>
+      @type tail
+      path /var/log/containers/*.log
+      pos_file /var/log/fluentd/fluentd-containers.log.pos
+      time_format %Y-%m-%dT%H:%M:%S.%NZ
+      tag kubernetes.*
+      format json
+      read_from_head true
+    </source>
+
+    <source>
+      @type tail
+      format /^(?<time>[^ ]* [^ ,]*)[^\[]*\[[^\]]*\]\[(?<severity>[^ \]]*) *\] (?<message>.*)$/
+      time_format %Y-%m-%d %H:%M:%S
+      path /var/log/salt/minion
+      pos_file /var/log/fluentd/fluentd-salt.pos
+      tag salt
+    </source>
+
+    <source>
+      @type tail
+      format syslog
+      path /var/log/startupscript.log
+      pos_file /var/log/fluentd/fluentd-startupscript.log.pos
+      tag startupscript
+    </source>
+
+    <source>
+      @type tail
+      format /^time="(?<time>[^)]*)" level=(?<severity>[^ ]*) msg="(?<message>[^"]*)"( err="(?<error>[^"]*)")?( statusCode=($<status_code>\d+))?/
+      path /var/log/docker.log
+      pos_file /var/log/fluentd/fluentd-docker.log.pos
+      tag docker
+    </source>
+
+    <source>
+      @type tail
+      format none
+      path /var/log/etcd.log
+      pos_file /var/log/fluentd/fluentd-etcd.log.pos
+      tag etcd
+    </source>
+
+    <source>
+      @type tail
+      format kubernetes
+      multiline_flush_interval 5s
+      path /var/log/kubelet.log
+      pos_file /var/log/fluentd/fluentd-kubelet.log.pos
+      tag kubelet
+    </source>
+
+    <source>
+      @type tail
+      format kubernetes
+      multiline_flush_interval 5s
+      path /var/log/kube-proxy.log
+      pos_file /var/log/fluentd/fluentd-kube-proxy.log.pos
+      tag kube-proxy
+    </source>
+
+    <source>
+      @type tail
+      format kubernetes
+      multiline_flush_interval 5s
+      path /var/log/kube-apiserver.log
+      pos_file /var/log/fluentd/fluentd-kube-apiserver.log.pos
+      tag kube-apiserver
+    </source>
+
+    <source>
+      @type tail
+      format kubernetes
+      multiline_flush_interval 5s
+      path /var/log/kube-controller-manager.log
+      pos_file /var/log/fluentd/fluentd-kube-controller-manager.log.pos
+      tag kube-controller-manager
+    </source>
+
+    <source>
+      @type tail
+      format kubernetes
+      multiline_flush_interval 5s
+      path /var/log/kube-scheduler.log
+      pos_file /var/log/fluentd/fluentd-kube-scheduler.log.pos
+      tag kube-scheduler
+    </source>
+
+    <source>
+      @type tail
+      format kubernetes
+      multiline_flush_interval 5s
+      path /var/log/rescheduler.log
+      pos_file /var/log/fluentd/fluentd-rescheduler.log.pos
+      tag rescheduler
+    </source>
+
+    <source>
+      @type tail
+      format kubernetes
+      multiline_flush_interval 5s
+      path /var/log/glbc.log
+      pos_file /var/log/fluentd/fluentd-glbc.log.pos
+      tag glbc
+    </source>
+
+    <source>
+      @type tail
+      format kubernetes
+      multiline_flush_interval 5s
+      path /var/log/cluster-autoscaler.log
+      pos_file /var/log/fluentd/fluentd-cluster-autoscaler.log.pos
+      tag cluster-autoscaler
+    </source>
+
+    <filter kubernetes.**>
+      @type kubernetes_metadata
+    </filter>
+
+  fluentd.conf: |
+    @include kubernetes.conf
+    <system>
+      # equal to -qq option
+      log_level info
+    </system>
+
+    <source>
+      @type systemd
+      path /var/log/journal
+      filters [
+        {"_SYSTEMD_UNIT": "docker-healthcheck.service"},
+        {"_SYSTEMD_UNIT": "docker.service"},
+        {"_SYSTEMD_UNIT": "kops-configuration.service"},
+        {"_SYSTEMD_UNIT": "kubelet.service"},
+        {"_SYSTEMD_UNIT": "protokube.service"}
+      ]
+
+      <storage>
+        @type local
+        persistent true
+        path journald.k8s.pos
+      </storage>
+      tag journald.k8s
+      read_from_head false
+      <entry>
+        fields_strip_underscores true
+        fields_lowercase true
+      </entry>
+    </source>
+    <source>
+      @type prometheus
+      bind 0.0.0.0
+      port 24231
+      metrics_path /metrics
+    </source>
+
+    <source>
+      @type prometheus_output_monitor
+      interval 10
+      <labels>
+        hostname ${hostname}
+      </labels>
+    </source>
+
+    <filter journald.k8s>
+      @type grep
+      <regexp>
+        key MESSAGE
+        pattern (error|Error|ERROR)
+      </regexp>
+    </filter>
+
+    <match kubernetes.**>
+      @type rewrite_tag_filter
+      <rule>
+        key elk_index
+        pattern ^(.*)$
+        tag k8s_custom.$1
+      </rule>
+      <rule>
+        key kubernetes
+        pattern ^.*"container_name["=>]+vault".*$
+        tag k8s_custom.vault
+      </rule>
+      <rule>
+        key kubernetes
+        pattern ^.*"namespace_name["=>]+([^"]+).*$
+        tag k8s.$1
+      </rule>
+    </match>
+
+    <filter k8s.such>
+      @type grep
+      <regexp>
+        key stream
+        pattern ^stderr$
+      </regexp>
+      <regexp>
+        key kubernetes
+        pattern ^.*"container_name["=>]+frontend-proxy".*$
+      </regexp>
+    </filter>
+
+    <filter k8s.such>
+      @type parser
+      key_name log
+      format /^(?<time>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}) \[(?<log_level>\w+)\] (?<pid>\d+).(?<tid>\d+): (?<message>.*)$/
+      reserve_data true
+    </filter>
+
+    <filter k8s.**>
+      @type record_transformer
+      enable_ruby
+      <record>
+        host ${record["kubernetes"]["host"]}
+        service ${begin record["service"] || record["kubernetes"]["container_name"]; rescue => _; nil; end || "unknown"}
+        level ${record["level"] || "INFO"}
+      </record>
+    </filter>
+
+    <filter k8s.kube-system>
+      @type record_transformer
+      remove_keys stream,log,docker,kubernetes.host
+      enable_ruby
+      <record>
+        service ${begin record["kubernetes"]["labels"]["k8s-app"] || record["kubernetes"]["labels"]["app"] || record["kubernetes"]["container_name"]; rescue => _; nil; end || "unknown"}
+        host ${begin record["kubernetes"]["host"]; rescue => _; nil; end || "unknown" }
+        ret MIN
+        ts ${ require 'time'; Time.now.iso8601(3) }
+        level ${record["stream"] == "stderr" ? "ERROR" : "INFO"}
+        message ${record["log"]}
+      </record>
+    </filter>
+
+    {{ $values := .Values }}
+
+    <match k8s_custom.*>
+      @type forest
+      subtype elasticsearch
+      remove_prefix k8s_custom
+      <template>
+        type_name ${tag}
+        index_name ${tag}
+        logstash_format true
+        logstash_prefix ${tag}
+        <buffer>
+          timekey 60
+          flush_mode interval
+          flush_interval 1s
+        </buffer>
+        host {{ index $values.es $values.stage "host" }}
+        port {{ index $values.es $values.stage "port" }}
+        scheme {{ index $values.es $values.stage "scheme" }}
+        ssl_verify false
+      </template>
+    </match>
+
+    {{ range .Values.createIndexForNamespaces }}
+    <match k8s.{{ . }}>
+      @type copy
+      <store>
+        @type elasticsearch
+        type_name "{{ . }}"
+        logstash_format true
+        logstash_prefix "{{ . }}"
+        <buffer>
+          timekey 60
+          flush_mode interval
+          flush_interval 1s
+        </buffer>
+        host {{ index $values.es $values.stage "host" }}
+        port {{ index $values.es $values.stage "port" }}
+        scheme {{ index $values.es $values.stage "scheme" }}
+        ssl_verify false
+      </store>
+      <store>
+        @type prometheus
+        <metric>
+          name fluentd_output_loglevel_num_records_total
+          type counter
+          desc The total number of incoming prfn records
+          <labels>
+            namespace {{.}}
+            app ${service}
+            level ${level}
+            host ${host}
+          </labels>
+        </metric>
+      </store>
+    </match>
+    {{ end }}
+
+    <match k8s.**>
+      @type elasticsearch
+      type_name "k8s"
+      logstash_format true
+      logstash_prefix "kubernetes"
+      <buffer>
+        timekey 60
+        flush_mode interval
+        flush_interval 1s
+      </buffer>
+      host {{ index $values.es $values.stage "host" }}
+      port {{ index $values.es $values.stage "port" }}
+      scheme {{ index $values.es $values.stage "scheme" }}
+      ssl_verify false
+    </match>
+
+    <match journald.k8s>
+      @type elasticsearch
+      type_name "journald"
+      logstash_format true
+      logstash_prefix "k8s-node-journald"
+      <buffer>
+        timekey 60
+        flush_mode interval
+        flush_interval 1s
+      </buffer>
+      host {{ index $values.es $values.stage "host" }}
+      port {{ index $values.es $values.stage "port" }}
+      scheme {{ index $values.es $values.stage "scheme" }}
+      ssl_verify false
+    </match>
+
+    <match {kube-apiserver,kube-controller-manager,kube-proxy,rescheduler}>
+      @type elasticsearch
+      type_name "kubernetes"
+      include_tag_key true
+      tag_key service
+      logstash_format true
+      logstash_prefix "k8s-master-logs"
+      <buffer>
+        timekey 60
+        flush_mode interval
+        flush_interval 1s
+      </buffer>
+      host {{ index $values.es $values.stage "host" }}
+      port {{ index $values.es $values.stage "port" }}
+      scheme {{ index $values.es $values.stage "scheme" }}
+      ssl_verify false
+    </match>

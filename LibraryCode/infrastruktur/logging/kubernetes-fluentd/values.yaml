@@ -1,0 +1,15 @@
+# all logs by default go to kubernetes-* indices. If apps in a specific namespace should be routed to
+# their own index, please list the namespace here
+createIndexForNamespaces:
+  - kube-public
+  - kube-system
+
+# Menge an Arbeitsspeicher welche diese App maximal verbraucht (docker + jvm + stack + heap)
+memoryLimit: 512Mi
+memoryRequest: 128Mi
+
+rbac:
+  create: true
+
+psp:
+  create: true

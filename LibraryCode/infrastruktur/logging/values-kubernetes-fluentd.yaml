@@ -1,0 +1,11 @@
+image:
+  repository: quay.io/fakod/kubernetes-fluentd
+  tag: latest
+
+stage: prod
+
+es:
+  prod:
+    host: elasticsearch-log
+    port: 9200
+    scheme: https

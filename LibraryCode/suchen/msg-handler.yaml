@@ -1,0 +1,89 @@
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: suchen-msg-handler-config
+  labels:
+    app: suchen-msg-handler
+    role: backend
+    scs: suchen
+data:
+  package.json: |
+    {
+      "dependencies": {
+        "eventsource": "^1.0.5"
+      }
+    }
+  script.js: |
+    var https = require('https')
+    new (require('eventsource'))('http://einbuchen-intern/events')
+        .addEventListener('BuchEingebucht', (e) => {
+            var book = JSON.parse(e.data)
+            book.EventId = e.lastEventId
+            var bookAsString = JSON.stringify(book)
+            let opts = {
+                host: 'elasticsearch-suchen',
+                port: '9200',
+                path: '/library/books/' + book.Isbn,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(bookAsString),
+                }
+            }
+            process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+            let req = https.request(opts, res => {
+                if (res.statusCode == 200) {
+                    console.log("inserted " + book.Isbn)
+                } else {
+                    res.setEncoding("utf-8")
+                    res.on("data", console.error)
+                }
+            })
+            req.write(bookAsString);
+            req.end();
+        })
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: suchen-msg-handler
+  labels:
+    app: suchen-msg-handler
+    role: backend
+    scs: suchen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: suchen-msg-handler
+  template:
+    metadata:
+      labels:
+        app: suchen-msg-handler
+    spec:
+      initContainers:
+      - name: script-creator
+        image: node:8-alpine
+        command: ['/bin/sh', '-c', 'cp /init/* /scripts/; cd scripts; npm install']
+        volumeMounts:
+          - name: init-volume
+            mountPath: /init
+          - name: script-volume
+            mountPath: /scripts
+      containers:
+      - name: suchen-msg-handler
+        image: node:8-alpine
+        command: ['node', '/scripts/script.js']
+        volumeMounts:
+          - name: script-volume
+            mountPath: /scripts
+      volumes:
+        - name: init-volume
+          configMap:
+            name: suchen-msg-handler-config
+        - name: script-volume
+          emptyDir: {}
